@@ -7,7 +7,7 @@
  * Obviously not production-ready code, just simple and to the point.
  */
 
-require "lib/OAuth2StorageMongo.php";
+require_once "lib/OAuth2StorageMongo.php";
 
 if ($_POST && isset($_POST["user_name"]) && isset($_POST["user_secret"])) {
 	$oauth = new OAuth2StorageMongo();
