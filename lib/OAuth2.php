@@ -1,7 +1,7 @@
 <?php
-require 'OAuth2ServerException.php';
-require 'OAuth2AuthenticateException.php';
-require 'OAuth2RedirectException.php';
+require_once 'OAuth2ServerException.php';
+require_once 'OAuth2AuthenticateException.php';
+require_once 'OAuth2RedirectException.php';
 
 /**
  * @mainpage
