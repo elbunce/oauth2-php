@@ -13,7 +13,7 @@ class All_OAuth2_Tests extends PHPUnit_Framework_TestSuite {
     $this->setName ( 'OAuth2Suite' );
 
     foreach (glob(__DIR__.'/*Test.php') as $filename) {
-      require $filename;
+      require_once $filename;
       $class = basename($filename, '.php');
       $this->addTestSuite($class);
     }
