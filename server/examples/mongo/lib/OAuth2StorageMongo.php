@@ -154,7 +154,10 @@ class OAuth2StorageMongo implements IOAuth2GrantCode, IOAuth2RefreshTokens, IOAu
 		if (!in_array('client_credentials', $client['grant_types']))
 			return FALSE;
 
-		return $this->checkPassword($client['pw'], $client_secret, $client_id);
+		if (!$this->checkPassword($client['pw'], $client_secret, $client_id))
+			return FALSE;
+
+		return array("client_id" => $client_id);
 	}
 
 	/**
