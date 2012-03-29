@@ -667,6 +667,8 @@ class OAuth2 {
 				if ($stored === FALSE) {
 					throw new OAuth2ServerException(self::HTTP_BAD_REQUEST, self::ERROR_INVALID_GRANT);
 				}
+
+				$stored["scope"] = $input["scope"];
 				break;
 			
 			case self::GRANT_TYPE_CLIENT_CREDENTIALS:
@@ -678,12 +680,9 @@ class OAuth2 {
 					throw new OAuth2ServerException(self::HTTP_BAD_REQUEST, self::ERROR_INVALID_CLIENT, 'The client_secret is mandatory for the "client_credentials" grant type');
 				}
 				$stored = $this->storage->checkClientCredentialsGrant($client[0], $client[1]);
+				$stored["scope"] = $input["scope"];
 
 				// NB: We don't need to check for $stored==false, because it was checked above already
-				// ELB: Yes, we do, since this grant_type may not be supported for all client_id's
-				if ($stored === FALSE) {
-					throw new OAuth2ServerException(self::HTTP_BAD_REQUEST, self::ERROR_INVALID_GRANT);
-				}
 
 				// per http://tools.ietf.org/html/draft-ietf-oauth-v2-20#section-4.4.3 client_credentials SHOULD NOT
 				// generate a refresh token
@@ -708,7 +707,7 @@ class OAuth2 {
 				if ($stored["expires"] < time()) {
 					throw new OAuth2ServerException(self::HTTP_BAD_REQUEST, self::ERROR_INVALID_GRANT, 'Refresh token has expired');
 				}
-				
+
 				// store the refresh token locally so we can delete it when a new refresh token is generated
 				$this->oldRefreshToken = $stored["refresh_token"];
 				break;
