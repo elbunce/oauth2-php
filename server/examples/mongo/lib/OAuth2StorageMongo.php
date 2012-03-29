@@ -6,15 +6,14 @@
  * 
  */
 
-require __DIR__ . '/../../../../lib/OAuth2.php';
-require __DIR__ . '/../../../../lib/IOAuth2Storage.php';
-require __DIR__ . '/../../../../lib/IOAuth2GrantCode.php';
-require __DIR__ . '/../../../../lib/IOAuth2GrantClient.php';
-require __DIR__ . '/../../../../lib/IOAuth2GrantUser.php';
-require __DIR__ . '/../../../../lib/IOAuth2RefreshTokens.php';
+require_once __DIR__ . '/../../../../lib/OAuth2.php';
+require_once __DIR__ . '/../../../../lib/IOAuth2Storage.php';
+require_once __DIR__ . '/../../../../lib/IOAuth2GrantCode.php';
+require_once __DIR__ . '/../../../../lib/IOAuth2GrantClient.php';
+require_once __DIR__ . '/../../../../lib/IOAuth2GrantUser.php';
+require_once __DIR__ . '/../../../../lib/IOAuth2RefreshTokens.php';
 
 /**
- * WARNING: This example file has not been kept up to date like the PDO example has.
  * 
  * Mongo storage engine for the OAuth2 Library.
  */
@@ -49,14 +48,6 @@ class OAuth2StorageMongo implements IOAuth2GrantCode, IOAuth2RefreshTokens, IOAu
 	 */
 	function __destruct() {
 		$this->db = NULL; // Release db connection
-	}
-
-	/**
-	 * Handle PDO exceptional cases.
-	 */
-	private function handleException($e) {
-		echo 'Database error: ' . $e->getMessage();
-		exit();
 	}
 
 	/**
@@ -147,12 +138,7 @@ class OAuth2StorageMongo implements IOAuth2GrantCode, IOAuth2RefreshTokens, IOAu
 	 * @see IOAuth2GrantClient::checkClientCredentialsGrant()
 	 */
 	public function checkClientCredentialsGrant($client_id, $client_secret) {
-		$client = $this->db->clients->findOne(array('_id' => $client_id), array('pw', 'grant_types'));
-		if (!isset($client['grant_types']))
-			return FALSE;
-
-		if (!in_array('client_credentials', $client['grant_types']))
-			return FALSE;
+		$client = $this->db->clients->findOne(array('_id' => $client_id), array('pw'));
 
 		if (!$this->checkPassword($client['pw'], $client_secret, $client_id))
 			return FALSE;
@@ -164,13 +150,6 @@ class OAuth2StorageMongo implements IOAuth2GrantCode, IOAuth2RefreshTokens, IOAu
 	 * @see IOAuth2GrantUser::checkUserCredentials()
 	 */
 	public function checkUserCredentials($client_id, $username, $password) {
-		$client = $this->db->clients->findOne(array('_id' => $client_id), array('grant_types'));
-		if (!isset($client['grant_types']))
-			return FALSE;
-
-		if (!in_array('password', $client['grant_types']))
-			return FALSE;
-
 		$user = $this->db->users->findOne(array("_id" => $username));
 		if (!$this->checkPassword($user['pw'], $password, $username))
 			return false;
@@ -200,7 +179,14 @@ class OAuth2StorageMongo implements IOAuth2GrantCode, IOAuth2RefreshTokens, IOAu
 	 * @see IOAuth2Storage::checkRestrictedGrantType()
 	 */
 	public function checkRestrictedGrantType($client_id, $grant_type) {
-		return TRUE; // Not implemented
+		$client = $this->db->clients->findOne(array('_id' => $client_id), array('grant_types'));
+
+		// if no grant types are specified, assume all are valid
+		if (!isset($client['grant_types']))
+			return TRUE;
+
+		// return true iff the grant_type is amongst those listed
+		return in_array($grant_type, $client['grant_types']);
 	}
 
 	/**
