@@ -29,6 +29,7 @@ require_once 'OAuth2RedirectException.php';
  *
  * @see http://code.google.com/p/oauth2-php/
  * @see https://github.com/quizlet/oauth2-php
+ * @see https://github.com/elbunce/oauth2-php
  */
 
 /**
@@ -574,6 +575,9 @@ class OAuth2 {
 	 * retrieved from POST, but you can override to whatever method you like.
 	 * @throws OAuth2ServerException
 	 * 
+	 * @return array
+	 * Token
+	 *
 	 * @see http://tools.ietf.org/html/draft-ietf-oauth-v2-20#section-4
 	 * @see http://tools.ietf.org/html/draft-ietf-oauth-v2-21#section-10.6
 	 * @see http://tools.ietf.org/html/draft-ietf-oauth-v2-21#section-4.1.3
@@ -753,6 +757,10 @@ class OAuth2 {
 		// Send response
 		$this->sendJsonHeaders();
 		echo json_encode($token);
+
+		// give the caller some info on what was just created...
+		$token['client_id'] = $client[0];
+		return $token;
 	}
 
 	/**

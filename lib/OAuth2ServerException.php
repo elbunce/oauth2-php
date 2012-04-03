@@ -41,6 +41,13 @@ class OAuth2ServerException extends Exception {
 	/**
 	 * @return string 
 	 */
+	public function getError() {
+		return $this->errorData['error'];
+	}
+
+	/**
+	 * @return string 
+	 */
 	public function getHttpCode() {
 		return $this->httpCode;
 	}
